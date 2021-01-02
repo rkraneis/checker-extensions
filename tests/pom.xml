@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.rkraneis.checker</groupId>
+        <artifactId>checker-extensions</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>tests</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>units-qual</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>checkerframework</id>
+            <activation>
+                <jdk>[1.8,13)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.8.1</version>
+                        <configuration>
+                            <fork>true</fork> <!-- Must fork or else JVM arguments are ignored. -->
+                            <compilerArguments>
+                                <Xmaxerrs>10000</Xmaxerrs>
+                                <Xmaxwarns>10000</Xmaxwarns>
+                            </compilerArguments>
+                            <annotationProcessorPaths>
+                                <path>
+                                    <groupId>org.checkerframework</groupId>
+                                    <artifactId>checker</artifactId>
+                                    <version>3.8.0</version>
+                                </path>
+                                <path>
+                                    <groupId>io.github.rkraneis.checker</groupId>
+                                    <artifactId>units</artifactId>
+                                    <version>1.0-SNAPSHOT</version>
+                                </path>
+                            </annotationProcessorPaths>
+                            <annotationProcessors>
+                                <!-- Add all the checkers you want to enable here -->
+                                <annotationProcessor>org.checkerframework.checker.nullness.NullnessChecker</annotationProcessor>
+                                <annotationProcessor>org.checkerframework.checker.units.UnitsChecker</annotationProcessor>
+                            </annotationProcessors>
+                            <compilerArgs>
+                                <!-- <arg>-Awarns</arg> --> <!-- -Awarns turns type-checking errors into warnings. -->
+                                <arg>-Aunits=io.github.rkraneis.checker.units.qual.Frequency,io.github.rkraneis.checker.units.qual.Hz,io.github.rkraneis.checker.units.qual.kHz,io.github.rkraneis.checker.units.qual.Force,io.github.rkraneis.checker.units.qual.N,io.github.rkraneis.checker.units.qual.LinearMomentum,io.github.rkraneis.checker.units.qual.Ns</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.checkerframework</groupId>
+                    <artifactId>checker</artifactId>
+                    <version>3.8.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>units</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>checkerframework-jdk8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <!-- using github.com/google/error-prone-javac is required when running on JDK 8 -->
+            <properties>
+                <javac.version>9+181-r4173-1</javac.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>javac</artifactId>
+                    <version>9+181-r4173-1</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <fork>true</fork>
+                            <compilerArgs combine.children="append">
+                                <arg>-Xbootclasspath/p:${annotatedJdk}</arg>
+                                <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${javac.version}/javac-${javac.version}.jar</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>checkerframework-jdk11</id>
+            <activation>
+                <jdk>11</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <fork>true</fork>
+                            <compilerArgs combine.children="append">
+                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <properties>
+                <!-- Temporary until animal-sniffer-maven-plugin is released with https://github.com/mojohaus/animal-sniffer/pull/91.
+                Version 1.19 is broken:  https://github.com/mojohaus/animal-sniffer/issues/76. -->
+                <animal.sniffer.skip>true</animal.sniffer.skip>
+            </properties>
+        </profile>
+    </profiles>
+</project>

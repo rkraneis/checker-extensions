@@ -23,6 +23,7 @@
     <modules>
         <module>units</module>
         <module>units-qual</module>
+        <module>tests</module>
     </modules>
 
     <properties>
@@ -31,4 +32,9 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>checkerframework</id>
+        </profile>
+    </profiles>
 </project>
