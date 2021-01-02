@@ -15,22 +15,6 @@
         <errorProneJavac>${com.google.errorprone:javac:jar}</errorProneJavac>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <!-- This plugin will set properties values using dependency information -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>properties</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
     <dependencies>
         <!-- Annotations from the Checker Framework: nullness, interning, locking, ... -->
         <dependency>
@@ -45,7 +29,23 @@
             <version>9+181-r4173-1</version>
         </dependency>
     </dependencies>
-    
+
+    <build>
+        <plugins>
+            <plugin><!-- This plugin will set properties values using dependency information -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <profiles>
         <profile>
             <id>checkerframework</id>
